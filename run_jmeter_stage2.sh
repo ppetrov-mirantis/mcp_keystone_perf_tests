@@ -44,9 +44,9 @@ for jmx_file in $(ls $scenarios_dest_home | grep .jmx || exit 1); do
   echo "Building report for scenario "$jmx_file""
   percentilles_report_file="$(echo $jmx_file | cut -f 1 -d ".")_percentilles_report.csv"
   synthesis_report_file="$(echo $jmx_file | cut -f 1 -d ".")_synthesis_report.csv"
-  java -jar $jmeter_dest_home/lib/ext/CMDRunner.jar --tool Reporter --generate-csv ~/$testresults_dest_home/$percentilles_report_file \
+  java -jar $jmeter_dest_home/lib/ext/CMDRunner.jar --tool Reporter --generate-csv $testresults_dest_home/$percentilles_report_file \
                                                     --input-jtl $jtl_filename --plugin-type ResponseTimesPercentiles --start-offset 20
-  java -jar $jmeter_dest_home/lib/ext/CMDRunner.jar --tool Reporter --generate-csv ~/$testresults_dest_home/$synthesis_report_file \
+  java -jar $jmeter_dest_home/lib/ext/CMDRunner.jar --tool Reporter --generate-csv $testresults_dest_home/$synthesis_report_file \
                                                     --input-jtl $jtl_filename --plugin-type SynthesisReport --start-offset 20
 done
 
