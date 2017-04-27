@@ -2,6 +2,8 @@
 # to be automatically replaced at the "stage1"
 SNAPSHOT=
 CFG_IP=
+TEST_DURATION=
+
 jmeter_deployment_node_ip=
 keystone_internal_ip=
 keystone_user=
@@ -27,14 +29,10 @@ for jmx_file in $(ls $scenarios_dest_home | grep .jmx || exit 1); do
   jtl_filename=$testresults_dest_home/$(echo $jmx_file | cut -f 1 -d ".").jtl
 
   echo "\nExecuting scenario '$jmx_file' saving results to '$jtl_filename'"
-  estimated_test_duration=$(cat $scenarios_dest_home/$jmx_file \
-                          | grep -oP '((?<=<stringProp name="Hold">)|(?<=<stringProp name="RampUp">))(.*)(?=</stringProp>)' \
-                          | awk '{SUM += $1} END {print SUM}')
-
-  scen_exec_string="timeout --kill-after=5s --signal=9 $((estimated_test_duration+10)) \
+  scen_exec_string="timeout --kill-after=5s --signal=9 $((TEST_DURATION+10)) \
                     $jmeter_dest_home/bin/jmeter -n -t $scenarios_dest_home/$jmx_file \
                                                  -JKEYSTONE_IP="$keystone_internal_ip" \
-                                                 -Jload_duration=30 -Jusername=$keystone_user \
+                                                 -Jload_duration="$TEST_DURATION" -Jusername=$keystone_user \
                                                  -Jpassword=$keystone_password\
                                                  -Jjtl_logfile=$jtl_filename"
   echo $scen_exec_string

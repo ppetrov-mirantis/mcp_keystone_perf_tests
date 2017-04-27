@@ -148,7 +148,7 @@ props.put(&quot;AdminPath&quot;, parts[7]);</stringProp>
         <stringProp name="TargetLevel">160</stringProp>
         <stringProp name="RampUp">10</stringProp>
         <stringProp name="Steps"></stringProp>
-        <stringProp name="Hold">${__javaScript(parseInt(${load_duration}))}</stringProp>
+        <stringProp name="Hold">${__P(load_duration)}</stringProp>
         <stringProp name="LogFilename"></stringProp>
         <stringProp name="Iterations"></stringProp>
         <stringProp name="ConcurrencyLimit">120</stringProp>
