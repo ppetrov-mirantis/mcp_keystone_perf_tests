@@ -22,6 +22,9 @@ jmeter_results_storage="$(echo ~/)jmeter_test_results_bkp"
 echo "Unpacking JMeter environment..."
 tar -zxf $jmeter_dest_home/jmeter_w_plugins.tar.gz -C $jmeter_dest_home && chmod 755 $tests_basedir -R || exit 1
 
+# clear results dir (for case when this script was run manually)
+rm $testresults_dest_home/*
+
 # Run Jmeter tests for current Keystone configuration
 for jmx_file in $(ls $scenarios_dest_home | grep .jmx || exit 1); do
   
