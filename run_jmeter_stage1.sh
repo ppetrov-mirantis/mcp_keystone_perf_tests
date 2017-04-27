@@ -64,11 +64,11 @@ $jmeter_node_ssh_connection "'git clone https://github.com/ppetrov-mirantis/mcp_
 echo "Starting stage-2 script"
 $jmeter_node_ssh_connection "'sed -i "-e s/SNAPSHOT=$/SNAPSHOT=$SNAPSHOT/g \
                                       -e s/CFG_IP=$/CFG_IP=$CFG_IP/g \
-                                      -e $/TEST_DURATION=$/TEST_DURATION=$TEST_DURATION/g \
+                                      -e s/TEST_DURATION=$/TEST_DURATION=$TEST_DURATION/g \
                                       -e s/jmeter_deployment_node_ip=$/jmeter_deployment_node_ip=$jmeter_deployment_node_ip/g \
                                       -e s/keystone_internal_ip=$/keystone_internal_ip=$keystone_internal_ip/g \
                                       -e s/keystone_user=$/keystone_user=$keystone_user/g \
                                       -e s/keystone_password=$/keystone_password=$keystone_password/g" \
                                          ~/$tests_basedir/run_jmeter_stage2.sh'"
 
-sshpass -p $cfg_node_password ssh -tt -o StrictHostKeyChecking=no $cfg_node_login@$CFG_IP "sudo ssh -tt $jmeter_deployment_node_ip '~/$tests_basedir/run_jmeter_stage2.sh'"
+#sshpass -p $cfg_node_password ssh -tt -o StrictHostKeyChecking=no $cfg_node_login@$CFG_IP "sudo ssh -tt $jmeter_deployment_node_ip '~/$tests_basedir/run_jmeter_stage2.sh'"
