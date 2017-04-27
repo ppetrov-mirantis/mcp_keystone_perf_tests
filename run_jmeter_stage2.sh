@@ -36,7 +36,7 @@ for jmx_file in $(ls $scenarios_dest_home | grep .jmx || exit 1); do
                                                  -Jpassword=$keystone_password\
                                                  -Jjtl_logfile=$jtl_filename"
   echo $scen_exec_string
-  $scen_exec_string || exit 1
+  $scen_exec_string
   echo "Scenario '$jmx_file' is finished."
 
   echo "Building report for scenario "$jmx_file""
