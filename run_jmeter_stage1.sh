@@ -5,14 +5,14 @@ scenarios_dest_home="$tests_basedir/scenarios"
 testresults_dest_home="$tests_basedir/results"
 utils_dest_home="$tests_basedir/utils"
 
-cfg_node_login=""
-cfg_node_password=""
+cfg_node_login=
+cfg_node_password=
 
-SNAPSHOT=XY
+SNAPSHOT=
 CFG_IP=
 
-keystone_user=admin
-keystone_password=password
+keystone_user=
+keystone_password=
 
 echo "Starting stage-1 script"
 echo "Connecting to $CFG_IP salt-master ..."
@@ -40,13 +40,9 @@ echo "Keystone internal IP: $keystone_internal_ip"
 
 jmeter_node_ssh_connection="$cfg_ssh_connection sudo ssh $jmeter_deployment_node_ip "
 
-
-# Create target directory
-$jmeter_node_ssh_connection "'(rm -r $tests_basedir 2>/dev/null || echo > /dev/null) && mkdir $tests_basedir'" || exit 1
-
+# Install Java if necessary
 $jmeter_node_ssh_connection sh << 'EOF'
 java_pkgs_number=$(dpkg-query -l *jre | grep ii | tr -s " " | cut -f 2 -d " " | wc -l)
-echo "Pkg_number: $java_pkgs_number" > java_pkg.log
 if [ $java_pkgs_number -lt 1 ]
   then
     echo "Installing java..."
@@ -56,18 +52,20 @@ if [ $java_pkgs_number -lt 1 ]
 fi
 EOF
 
+# Create target directory
+$jmeter_node_ssh_connection "'(rm -r $tests_basedir 2>/dev/null || echo > /dev/null) && mkdir $tests_basedir'" || exit 1
+
 # Upload test infrastructure
 echo "Uploading JMeter environment..."
-#$jmeter_node_ssh_connection "git clone https://github.com/ppetrov-mirantis/mcp_keystone_perf_tests/ ~/$tests_basedir/"
+$jmeter_node_ssh_connection "'git clone https://github.com/ppetrov-mirantis/mcp_keystone_perf_tests/ ~/$tests_basedir/'"
 
 echo "Starting stage-2 script"
-$jmeter_node_ssh_connection sh << 'EOF'
-  sed -i "s/SNAPSHOT=/SNAPSHOT=$SNAPSHOT/g" ~/$tests_basedir/run_jmeter_stage2.sh
-  sed -i "s/CFG_IP=/CFG_IP=$CFG_IP/g" ~/$tests_basedir/run_jmeter_stage2.sh
-  sed -i "s/jmeter_deployment_node_ip=/jmeter_deployment_node_ip=$jmeter_deployment_node_ip/g" ~/$tests_basedir/run_jmeter_stage2.sh
-  sed -i "s/keystone_internal_ip=/keystone_internal_ip=$keystone_internal_ip/g" ~/$tests_basedir/run_jmeter_stage2.sh
-  sed -i "s/keystone_user=/keystone_user=$keystone_user/g" ~/$tests_basedir/run_jmeter_stage2.sh
-  sed -i "s/keystone_password=/keystone_password=$keystone_password$/g" ~/$tests_basedir/run_jmeter_stage2.sh
-EOF
+$jmeter_node_ssh_connection "'sed -i "-e s/SNAPSHOT=$/SNAPSHOT=$SNAPSHOT/g \
+                                      -e s/CFG_IP=$/CFG_IP=$CFG_IP/g \
+                                      -e s/jmeter_deployment_node_ip=$/jmeter_deployment_node_ip=$jmeter_deployment_node_ip/g \
+                                      -e s/keystone_internal_ip=$/keystone_internal_ip=$keystone_internal_ip/g \
+                                      -e s/keystone_user=$/keystone_user=$keystone_user/g \
+                                      -e s/keystone_password=$/keystone_password=$keystone_password/g" \
+                                         ~/$tests_basedir/run_jmeter_stage2.sh'"
 
 sshpass -p $cfg_node_password ssh -tt -o StrictHostKeyChecking=no $cfg_node_login@$CFG_IP "sudo ssh -tt $jmeter_deployment_node_ip '~/$tests_basedir/run_jmeter_stage2.sh'"

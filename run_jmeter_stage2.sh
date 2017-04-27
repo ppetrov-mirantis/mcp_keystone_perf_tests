@@ -9,35 +9,34 @@ keystone_password=
 
 
 # Destination dirs
-tests_basedir="jmeter_tests"
+tests_basedir="$(echo ~/)jmeter_tests"
 jmeter_dest_home="$tests_basedir/jmeter"
 scenarios_dest_home="$tests_basedir/scenarios"
 testresults_dest_home="$tests_basedir/results"
 utils_dest_home="$tests_basedir/utils"
 
-jmeter_results_storage="jmeter_test_results_bkp"
-curr_home_dir=$(echo ~/)
+jmeter_results_storage="$(echo ~/)jmeter_test_results_bkp"
 
 echo "Unpacking JMeter environment..."
-tar -zxf $jmeter_dest_home/jmeter_w_plugins.tar.gz -C ~/$jmeter_dest_home && chmod 755 ~/$tests_basedir -R || exit 1
+tar -zxf $jmeter_dest_home/jmeter_w_plugins.tar.gz -C $jmeter_dest_home && chmod 755 $tests_basedir -R || exit 1
 
 # Run Jmeter tests for current Keystone configuration
-for jmx_file in $(ls ~/$scenarios_dest_home | grep .jmx || exit 1); do
+for jmx_file in $(ls $scenarios_dest_home | grep .jmx || exit 1); do
   
   # obtaining fullpath for each *.jtl-file
-  jtl_filename="$(~/$testresults_dest_home/$(echo $jmx_file | cut -f 1 -d ".").jtl)"
+  jtl_filename=$testresults_dest_home/$(echo $jmx_file | cut -f 1 -d ".").jtl
 
   echo "\nExecuting scenario '$jmx_file' saving results to '$jtl_filename'"
-  estimated_test_duration=$(cat ~/$scenarios_dest_home/$jmx_file \
+  estimated_test_duration=$(cat $scenarios_dest_home/$jmx_file \
                           | grep -oP '((?<=<stringProp name="Hold">)|(?<=<stringProp name="RampUp">))(.*)(?=</stringProp>)' \
                           | awk '{SUM += $1} END {print SUM}')
 
   scen_exec_string="timeout --kill-after=5s --signal=9 $((estimated_test_duration+10)) \
-                    $curr_home_dir/$jmeter_dest_home/bin/jmeter -n -t $curr_home_dir/$scenarios_dest_home/$jmx_file \
-                                                                -JKEYSTONE_IP="$keystone_internal_ip" \
-                                                                -Jload_duration=30 -Jusername=$keystone_user \
-                                                                -Jpassword=$keystone_password\
-                                                                -Jjtl_logfile=$jtl_filename"
+                    $jmeter_dest_home/bin/jmeter -n -t $scenarios_dest_home/$jmx_file \
+                                                 -JKEYSTONE_IP="$keystone_internal_ip" \
+                                                 -Jload_duration=30 -Jusername=$keystone_user \
+                                                 -Jpassword=$keystone_password\
+                                                 -Jjtl_logfile=$jtl_filename"
   echo $scen_exec_string
   $scen_exec_string || exit 1
   echo "Scenario '$jmx_file' is finished."
@@ -45,10 +44,10 @@ for jmx_file in $(ls ~/$scenarios_dest_home | grep .jmx || exit 1); do
   echo "Building report for scenario "$jmx_file""
   percentilles_report_file="$(echo $jmx_file | cut -f 1 -d ".")_percentilles_report.csv"
   synthesis_report_file="$(echo $jmx_file | cut -f 1 -d ".")_synthesis_report.csv"
-  java -jar ~/$jmeter_dest_home/lib/ext/CMDRunner.jar --tool Reporter --generate-csv ~/$testresults_dest_home/$percentilles_report_file \
-                                                      --input-jtl $jtl_filename --plugin-type ResponseTimesPercentiles --start-offset 20
-  java -jar ~/$jmeter_dest_home/lib/ext/CMDRunner.jar --tool Reporter --generate-csv ~/$testresults_dest_home/$synthesis_report_file \
-                                                      --input-jtl $jtl_filename --plugin-type SynthesisReport --start-offset 20
+  java -jar $jmeter_dest_home/lib/ext/CMDRunner.jar --tool Reporter --generate-csv ~/$testresults_dest_home/$percentilles_report_file \
+                                                    --input-jtl $jtl_filename --plugin-type ResponseTimesPercentiles --start-offset 20
+  java -jar $jmeter_dest_home/lib/ext/CMDRunner.jar --tool Reporter --generate-csv ~/$testresults_dest_home/$synthesis_report_file \
+                                                    --input-jtl $jtl_filename --plugin-type SynthesisReport --start-offset 20
 done
 
 # Save results to a local directory and send stats to TestRail
