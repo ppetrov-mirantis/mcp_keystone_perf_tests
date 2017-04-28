@@ -14,6 +14,8 @@ if len(sys.argv) >= 9:
     repo_snapshot_id = str(sys.argv[4])
     cluster_config = "\n**Masternode IP:** {0} \n**JMeter node IP:** {1}"\
                                 .format(str(sys.argv[5]), str(sys.argv[6]))
+    testrail_user = str(sys.argv[7])
+    testrail_password = str(sys.argv[8])
 else:
     jmx_home="/media/WORK_DATA/Installs/test tools/JMeter/apache-jmeter-3.0/bin/"
     #jmx_home="/media/mirantis_ws_disk/Installs/test tools/JMeter/apache-jmeter-3.0/bin/"
@@ -22,14 +24,18 @@ else:
     estimated_test_duration = "not logged"
     repo_snapshot_id = "XXX"
     cluster_config = "\n**Masternode IP:** unknown \n**JMeter node IP:** unknown"
+    
+    # to be set manually in this case
+    testrail_user = 'user'
+    testrail_password = 'password'
 
 reports = {}
 test_cases = []
 
 # Connecting to TestRail
 testrail_client = APIClient('https://mirantis.testrail.com/')
-testrail_client.user = 'user'
-testrail_client.password = 'password'
+testrail_client.user = testrail_user
+testrail_client.password = testrail_password
 test_suite_id = 6868
 
 #Getting expected result for each of test cases of test suite 6868 in TestRail

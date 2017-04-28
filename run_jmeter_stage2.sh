@@ -1,5 +1,5 @@
 
-# to be automatically replaced at the "stage1"
+# to be automatically replaced by the "stage1" script
 SNAPSHOT=
 CFG_IP=
 TEST_DURATION=
@@ -9,6 +9,8 @@ keystone_internal_ip=
 keystone_user=
 keystone_password=
 
+testrail_user=
+testrail_password=
 
 # Destination dirs
 tests_basedir="$(echo ~/)jmeter_tests"
@@ -58,7 +60,7 @@ mkdir $results_storage_dir || exit 1
 cp -r --copy-contents $testresults_dest_home/* $results_storage_dir/ || exit 1
 
 echo "Saving results to TestRail. . ."  
-#python ~/$utils_dest_home/jmeter_reports_parser.py ~/$testresults_dest_home/ ~/$scenarios_dest_home/ $estimated_test_duration $SNAPSHOT $CFG_IP $jmeter_deployment_node_ip
+#python ~/$utils_dest_home/jmeter_reports_parser.py ~/$testresults_dest_home/ ~/$scenarios_dest_home/ $estimated_test_duration $SNAPSHOT $CFG_IP $jmeter_deployment_node_ip $testrail_user $testrail_password
 #echo "Saving result files to $(pwd)/$results_storage_dir directory on Jenkins node"
 
 # need to clarify target host and target dir to upload the results

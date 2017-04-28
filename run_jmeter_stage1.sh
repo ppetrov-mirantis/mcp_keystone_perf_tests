@@ -16,6 +16,10 @@ TEST_DURATION=
 keystone_user=
 keystone_password=
 
+# TestRail reporting credentials
+testrail_user=
+testrail_password=
+
 echo "Starting stage-1 script"
 echo "Connecting to $CFG_IP salt-master ..."
 ssh-keygen -f ~/.ssh/known_hosts -R $CFG_IP
@@ -58,6 +62,7 @@ EOF
 $jmeter_node_ssh_connection "'(rm -r $tests_basedir 2>/dev/null || echo > /dev/null) && mkdir $tests_basedir'" || exit 1
 
 # Upload test infrastructure
+# !!!!! Repo address string should be replaced after merging to the internal performace-qa repo !!!!!
 echo "Uploading JMeter environment..."
 $jmeter_node_ssh_connection "'git clone https://github.com/ppetrov-mirantis/mcp_keystone_perf_tests/ ~/$tests_basedir/'"
 
@@ -68,7 +73,9 @@ $jmeter_node_ssh_connection "'sed -i "-e s/SNAPSHOT=$/SNAPSHOT=$SNAPSHOT/g \
                                       -e s/jmeter_deployment_node_ip=$/jmeter_deployment_node_ip=$jmeter_deployment_node_ip/g \
                                       -e s/keystone_internal_ip=$/keystone_internal_ip=$keystone_internal_ip/g \
                                       -e s/keystone_user=$/keystone_user=$keystone_user/g \
-                                      -e s/keystone_password=$/keystone_password=$keystone_password/g" \
+                                      -e s/keystone_password=$/keystone_password=$keystone_password/g \
+                                      -e s/testrail_user=$/testrail_user=$testrail_user/g \
+                                      -e s/testrail_password=$/testrail_password=$testrail_password/g" \
                                          ~/$tests_basedir/run_jmeter_stage2.sh'"
 
 sshpass -p $cfg_node_password ssh -tt -o StrictHostKeyChecking=no $cfg_node_login@$CFG_IP "sudo ssh -tt $jmeter_deployment_node_ip '~/$tests_basedir/run_jmeter_stage2.sh'"
