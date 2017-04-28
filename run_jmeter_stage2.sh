@@ -3,6 +3,7 @@
 SNAPSHOT=
 CFG_IP=
 TEST_DURATION=
+TEST_TARGET_RPS=
 
 jmeter_deployment_node_ip=
 keystone_internal_ip=
@@ -37,7 +38,9 @@ for jmx_file in $(ls $scenarios_dest_home | grep .jmx || exit 1); do
   scen_exec_string="timeout --kill-after=5s --signal=9 $((TEST_DURATION+10)) \
                     $jmeter_dest_home/bin/jmeter -n -t $scenarios_dest_home/$jmx_file \
                                                  -JKEYSTONE_IP="$keystone_internal_ip" \
-                                                 -Jload_duration="$TEST_DURATION" -Jusername=$keystone_user \
+                                                 -Jload_duration="$TEST_DURATION" \
+                                                 -Jtarget_load_rps="$TEST_TARGET_RPS" \
+                                                 -Jusername=$keystone_user \
                                                  -Jpassword=$keystone_password\
                                                  -Jjtl_logfile=$jtl_filename"
   echo $scen_exec_string
@@ -53,15 +56,17 @@ for jmx_file in $(ls $scenarios_dest_home | grep .jmx || exit 1); do
                                                     --input-jtl $jtl_filename --plugin-type SynthesisReport --start-offset 20
 done
 
-# Save results to a local directory and send stats to TestRail
+# Save results to a local directory 
 mkdir -p $jmeter_results_storage || exit 1
-results_storage_dir=$jmeter_results_storage/$(printf "testrun_results_$(date +%d.%m.%Y_%H-%M-%S)") || exit 1
+results_storage_dir=$jmeter_results_storage/$(printf "keystone_perf_testrun_results_$(date +%d.%m.%Y_%H-%M-%S)") || exit 1
 mkdir $results_storage_dir || exit 1
 cp -r --copy-contents $testresults_dest_home/* $results_storage_dir/ || exit 1
 
-echo "Saving results to TestRail. . ."  
-#python ~/$utils_dest_home/jmeter_reports_parser.py ~/$testresults_dest_home/ ~/$scenarios_dest_home/ $estimated_test_duration $SNAPSHOT $CFG_IP $jmeter_deployment_node_ip $testrail_user $testrail_password
-#echo "Saving result files to $(pwd)/$results_storage_dir directory on Jenkins node"
+# Save results to a remote host 
+# target host and target dir to upload the results need to be clarified
+#echo "Saving result files to $testresults_remote_dir directory on the Jenkins node"
+#scp -r -o StrictHostKeyChecking=no $results_storage_dir/* $remote_host_user@$remote_storage_host:~/$testresults_remote_dir/"
 
-# need to clarify target host and target dir to upload the results
-#scp -r -o StrictHostKeyChecking=no $login@$jmeter_deployment_node_ip:~/$testresults_dest_home/* $results_storage_dir/ && $jmeter_node_ssh_connection "rm -r ~/$testresults_dest_home/*"
+# send stats to TestRail (uncomment when necessary)
+# echo "Saving results to TestRail. . ."
+#python ~/$utils_dest_home/jmeter_reports_parser.py ~/$testresults_dest_home/ ~/$scenarios_dest_home/ $estimated_test_duration $SNAPSHOT $CFG_IP $jmeter_deployment_node_ip $testrail_user $testrail_password

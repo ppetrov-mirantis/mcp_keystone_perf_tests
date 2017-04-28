@@ -17,6 +17,11 @@
             <stringProp name="Argument.value">${__P(load_duration, 300)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
+          <elementProp name="target_load_rps" elementType="Argument">
+            <stringProp name="Argument.name">target_load_rps</stringProp>
+            <stringProp name="Argument.value">${__P(target_load_rps, 160)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
           <elementProp name="username" elementType="Argument">
             <stringProp name="Argument.name">username</stringProp>
             <stringProp name="Argument.value">${__P(username, admin)}</stringProp>
@@ -145,7 +150,7 @@ props.put(&quot;AdminPath&quot;, parts[7]);</stringProp>
       <com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup guiclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroupGui" testclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup" testname="Authenticate and Validate" enabled="true">
         <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <stringProp name="TargetLevel">160</stringProp>
+        <stringProp name="TargetLevel">${__P(target_load_rps)}</stringProp>
         <stringProp name="RampUp">20</stringProp>
         <stringProp name="Steps"></stringProp>
         <stringProp name="Hold">${__P(load_duration)}</stringProp>

@@ -11,7 +11,8 @@ cfg_node_password=
 SNAPSHOT=
 CFG_IP=
 # test duration (sec.)
-TEST_DURATION=
+TEST_DURATION=300
+TEST_TARGET_RPS=160
 
 keystone_user=
 keystone_password=
@@ -62,7 +63,7 @@ EOF
 $jmeter_node_ssh_connection "'(rm -r $tests_basedir 2>/dev/null || echo > /dev/null) && mkdir $tests_basedir'" || exit 1
 
 # Upload test infrastructure
-# !!!!! Repo address string should be replaced after merging to the internal performace-qa repo !!!!!
+# !!!!! Repo address string SHOULD BE REPLACED AFTER merging to the internal performace-qa repo and adopting to CI !!!!!
 echo "Uploading JMeter environment..."
 $jmeter_node_ssh_connection "'git clone https://github.com/ppetrov-mirantis/mcp_keystone_perf_tests/ ~/$tests_basedir/'"
 
@@ -70,6 +71,7 @@ echo "Starting stage-2 script"
 $jmeter_node_ssh_connection "'sed -i "-e s/SNAPSHOT=$/SNAPSHOT=$SNAPSHOT/g \
                                       -e s/CFG_IP=$/CFG_IP=$CFG_IP/g \
                                       -e s/TEST_DURATION=$/TEST_DURATION=$TEST_DURATION/g \
+                                      -e s/TEST_TARGET_RPS=$/TEST_TARGET_RPS=$TEST_TARGET_RPS/g \
                                       -e s/jmeter_deployment_node_ip=$/jmeter_deployment_node_ip=$jmeter_deployment_node_ip/g \
                                       -e s/keystone_internal_ip=$/keystone_internal_ip=$keystone_internal_ip/g \
                                       -e s/keystone_user=$/keystone_user=$keystone_user/g \
